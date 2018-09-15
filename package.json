@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
-    "build": "webpack --config build/webpack.prod.conf.js"
+    "build": "webpack --config build/webpack.prod.conf.js",
+    "lint": "eslint --ext .js,.vue src"
   },
   "keywords": [],
   "author": "",
