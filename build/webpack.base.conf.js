@@ -16,7 +16,7 @@ module.exports = {
     publicPath: '/'
   },
   plugins: [
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
   ],
   resolve: {
     extensions: ['.js', '.vue', '.json'],
@@ -55,13 +55,6 @@ module.exports = {
         include: [resolve('src')]
       },
       {
-        test: /\.css$/,
-        use: [
-          'vue-style-loader',
-          'css-loader'
-        ]
-      },
-      {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
         options: {
@@ -88,6 +81,7 @@ module.exports = {
     ]
   },
   node: {
+    // 参考：https://webpack.docschina.org/configuration/node/#node
     // prevent webpack from injecting useless setImmediate polyfill because Vue
     // source contains it (although only uses it if it's native).
     setImmediate: false,
