@@ -4,7 +4,6 @@ const merge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const baseWebpackConfig = require('./webpack.base.conf');
-const portfinder = require('portfinder');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 
 const HOST = process.env.HOST || '0.0.0.0';
