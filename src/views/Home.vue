@@ -1,18 +1,12 @@
 <template>
   <div class="home">
-    <img src="./highlight_bg.png" alt="">
-    <div class="test">
-      test234234
-    </div>
+    Home
   </div>
 </template>
 
 <script>
 export default {
   name: 'home',
-  mounted() {
-    console.log(process.env.BASE_URL);
-  },
 };
 </script>
 
