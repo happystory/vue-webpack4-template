@@ -38,16 +38,7 @@ module.exports = {
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          // 在模板编译过程中，编译器可以将某些特性转换为 require 调用
-          transformAssetUrls: {
-            video: ['src', 'poster'],
-            source: 'src',
-            img: 'src',
-            image: 'xlink:href'
-          }
-        }
+        loader: 'vue-loader'
       },
       {
         test: /\.js$/,
