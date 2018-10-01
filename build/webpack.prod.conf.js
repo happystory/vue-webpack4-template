@@ -8,53 +8,43 @@ const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const baseWebpackConfig = require('./webpack.base.conf');
 
+const baseCssRules = [
+  MiniCssExtractPlugin.loader,
+  {
+    loader: 'css-loader',
+    options: {
+      sourceMap: false,
+    },
+  },
+  {
+    loader: 'postcss-loader',
+    options: {
+      sourceMap: false,
+    },
+  },
+];
+
 const webpackConfig = merge(baseWebpackConfig, {
   mode: 'production',
   module: {
     rules: [
       {
         test: /\.css$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: false
-            }
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              sourceMap: false
-            }
-          }
-        ]
+        use: baseCssRules,
       },
       {
         test: /\.scss/,
         use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: false
-            }
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              sourceMap: false
-            }
-          },
+          ...baseCssRules,
           {
             loader: 'sass-loader',
             options: {
-              sourceMap: false
-            }
-          }
-        ]
+              sourceMap: false,
+            },
+          },
+        ],
       },
-    ]
+    ],
   },
   devtool: false,
   output: {
@@ -109,34 +99,34 @@ const webpackConfig = merge(baseWebpackConfig, {
           name: 'chunk-vendors',
           test: /[\\\/]node_modules[\\\/]/,
           priority: -10,
-          chunks: 'initial'
+          chunks: 'initial',
         },
         common: {
           name: 'chunk-common',
           minChunks: 2,
           priority: -20,
           chunks: 'initial',
-          reuseExistingChunk: true
-        }
-      }
+          reuseExistingChunk: true,
+        },
+      },
     },
     runtimeChunk: 'single',
     minimizer: [
       new UglifyJsPlugin({
         uglifyOptions: {
           compress: {
-            warnings: false
-          }
+            warnings: false,
+          },
         },
         sourceMap: false,
-        parallel: true
+        parallel: true,
       }),
     ],
   },
 });
 
 if (process.env.npm_config_report) {
-  const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+  const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
   webpackConfig.plugins.push(new BundleAnalyzerPlugin());
 }
 

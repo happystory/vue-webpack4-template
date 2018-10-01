@@ -1,25 +1,25 @@
 const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, '..', dir);
 }
 
 module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
-    app: './src/main.js'
+    app: './src/main.js',
   },
   output: {
     path: path.resolve(__dirname, '../dist'),
     filename: '[name].js',
-    publicPath: '/'
+    publicPath: '/',
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       '@': resolve('src'),
-    }
+    },
   },
   module: {
     rules: [
@@ -30,12 +30,12 @@ module.exports = {
         include: [resolve('src')],
         options: {
           formatter: require('eslint-friendly-formatter'),
-          emitWarning: true
-        }
+          emitWarning: true,
+        },
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader'
+        loader: 'vue-loader',
       },
       {
         test: /\.js$/,
@@ -50,26 +50,26 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: 'static/img/[name].[hash:7].[ext]'
-        }
+          name: 'static/img/[name].[hash:7].[ext]',
+        },
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: 'static/media/[name].[hash:7].[ext]'
-        }
+          name: 'static/media/[name].[hash:7].[ext]',
+        },
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: 'static/fonts/[name].[hash:7].[ext]'
-        }
-      }
-    ]
+          name: 'static/fonts/[name].[hash:7].[ext]',
+        },
+      },
+    ],
   },
   plugins: [
     new VueLoaderPlugin(),
@@ -80,6 +80,6 @@ module.exports = {
     fs: 'empty',
     net: 'empty',
     tls: 'empty',
-    child_process: 'empty'
-  }
-}
+    child_process: 'empty',
+  },
+};
