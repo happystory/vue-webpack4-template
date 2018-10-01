@@ -2,7 +2,7 @@ const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
 
 function resolve (dir) {
-  return path.join(__dirname, '..', dir)
+  return path.join(__dirname, '..', dir);
 }
 
 module.exports = {
@@ -15,9 +15,6 @@ module.exports = {
     filename: '[name].js',
     publicPath: '/'
   },
-  plugins: [
-    new VueLoaderPlugin(),
-  ],
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
@@ -43,7 +40,10 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src')]
+        include: [resolve('src')],
+        options: {
+          cacheDirectory: true,
+        },
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -71,13 +71,11 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new VueLoaderPlugin(),
+  ],
   node: {
-    // 参考：https://webpack.docschina.org/configuration/node/#node
-    // prevent webpack from injecting useless setImmediate polyfill because Vue
-    // source contains it (although only uses it if it's native).
     setImmediate: false,
-    // prevent webpack from injecting mocks to Node native modules
-    // that does not make sense for the client
     dgram: 'empty',
     fs: 'empty',
     net: 'empty',

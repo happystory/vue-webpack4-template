@@ -1,15 +1,22 @@
 const path = require('path');
+const os = require('os');
+const dns = require('dns');
+const { promisify } = require('util');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const baseWebpackConfig = require('./webpack.base.conf');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
+const portfinder = require('portfinder');
+const chalk = require('chalk');
+const baseWebpackConfig = require('./webpack.base.conf');
 
-const HOST = process.env.HOST || '0.0.0.0';
+const lookup = promisify(dns.lookup);
+
+const HOST = '0.0.0.0';
 const PORT = (process.env.PORT && Number(process.env.PORT)) || 8080;
 
-module.exports = merge(baseWebpackConfig, {
+const devWebpackConfig =  merge(baseWebpackConfig, {
   mode: 'development',
   module: {
     rules: [
@@ -59,7 +66,6 @@ module.exports = merge(baseWebpackConfig, {
   },
   // cheap-module-eval-source-map is faster for development
   devtool: '#source-map',
-  // these devServer options should be customized in /config/index.js
   devServer: {
     clientLogLevel: 'warning',
     historyApiFallback: {
@@ -68,7 +74,7 @@ module.exports = merge(baseWebpackConfig, {
       ],
     },
     hot: true,
-    contentBase: false, // since we use CopyWebpackPlugin.
+    contentBase: false,
     compress: true,
     host: HOST,
     port: PORT,
@@ -76,7 +82,7 @@ module.exports = merge(baseWebpackConfig, {
     overlay: { warnings: false, errors: true },
     publicPath: '/',
     proxy: {},
-    quiet: true, // necessary for FriendlyErrorsPlugin
+    quiet: true,
     watchOptions: {
       poll: false,
     }
@@ -84,38 +90,54 @@ module.exports = merge(baseWebpackConfig, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        BASE_URL: '"http://www.test.com/"'
+        // define your global vars here
       }
     }),
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: 'index.html',
-      inject: true
+      template: path.resolve(__dirname, '../public/index.html'),
+      inject: true,
+      templateParameters: {
+        BASE_URL: '/',
+      },
     }),
-    // copy custom static assets
     new CopyWebpackPlugin([
       {
-        from: path.resolve(__dirname, '../static'),
-        to: 'static',
-        ignore: ['.*']
+        from: path.resolve(__dirname, '../public'),
+        to: '',
+        ignore: ['index.html']
       }
     ]),
-    new FriendlyErrorsPlugin({
-      compilationSuccessInfo: {
-        messages: [`Your application is running here: http://${HOST}:${PORT}`],
-      },
-      onErrors: function (severity, errors) {
-        // You can listen to errors transformed and prioritized by the plugin
-        // severity can be 'error' or 'warning'
-      },
-      // should the console be cleared between each compilation?
-      // default is true
-      clearConsole: true,
-    }),
   ],
   optimization: {
     namedModules: true,
     noEmitOnErrors: true,
   },
+});
+
+module.exports = new Promise((resolve, reject) => {
+  portfinder.basePort = PORT;
+  portfinder.getPortPromise().then((port) => {
+    devWebpackConfig.devServer.port = port;
+
+    lookup(os.hostname()).then((res) => {
+      const ip = res.address;
+
+      devWebpackConfig.plugins.push(new FriendlyErrorsPlugin({
+        compilationSuccessInfo: {
+          messages: [chalk`App running at:\n  - Local:   {cyan http://localhost:{bold ${port}/}}\n  - Network: {cyan http://${ip}:{bold ${port}/}}`],
+        },
+        onErrors: undefined,
+        clearConsole: true,
+      }));
+
+      resolve(devWebpackConfig);
+    }).catch((err) => {
+      reject(err);
+    });
+  })
+  .catch((err) => {
+    reject(err);
+  });
 });

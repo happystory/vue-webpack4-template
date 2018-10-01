@@ -6,10 +6,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const baseWebpackConfig = require('./webpack.base.conf');
 
-module.exports = merge(baseWebpackConfig, {
+const webpackConfig = merge(baseWebpackConfig, {
   mode: 'production',
   module: {
     rules: [
@@ -65,44 +64,43 @@ module.exports = merge(baseWebpackConfig, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        BASE_URL: '"http://www.example.com/"'
-      }
+        BASE_URL: '"/"',
+      },
     }),
-    new CleanWebpackPlugin(['dist'], {
-      root: path.resolve(__dirname, '../'),
-    }),
-    // extract css into its own file
     new MiniCssExtractPlugin({
       filename: 'static/css/[name].[chunkhash].css',
     }),
-    // Compress extracted CSS. We are using this plugin so that possible
-    // duplicated CSS from different components can be deduped.
     new OptimizeCSSPlugin({}),
     new HtmlWebpackPlugin({
       filename: path.resolve(__dirname, '../dist/index.html'),
-      template: 'index.html',
+      template: path.resolve(__dirname, '../public/index.html'),
       inject: true,
       minify: {
         removeComments: true,
         collapseWhitespace: true,
-        removeAttributeQuotes: true
-        // more options:
-        // https://github.com/kangax/html-minifier#options-quick-reference
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
       },
-      // necessary to consistently work with multiple chunks
-      chunksSortMode: 'dependency'
+      chunksSortMode: 'dependency',
+      templateParameters: {
+        BASE_URL: '/',
+      },
     }),
-    // keep module.id stable when vendor modules does not change
     new webpack.NamedChunksPlugin(),
     new webpack.HashedModuleIdsPlugin(),
-    // copy custom static assets
     new CopyWebpackPlugin([
       {
-        from: path.resolve(__dirname, '../static'),
-        to: 'static',
-        ignore: ['.*']
-      }
-    ])
+        from: path.resolve(__dirname, '../public'),
+        to: '',
+        ignore: ['index.html'],
+      },
+    ]),
   ],
   optimization: {
     concatenateModules: true,
@@ -130,3 +128,10 @@ module.exports = merge(baseWebpackConfig, {
     ],
   },
 });
+
+if (process.env.npm_config_report) {
+  const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+  webpackConfig.plugins.push(new BundleAnalyzerPlugin());
+}
+
+module.exports = webpackConfig;
