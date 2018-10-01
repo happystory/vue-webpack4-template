@@ -103,16 +103,22 @@ const webpackConfig = merge(baseWebpackConfig, {
     ]),
   ],
   optimization: {
-    concatenateModules: true,
     splitChunks: {
-      chunks: 'all',
       cacheGroups: {
-        vendor: {
-          name: 'vendor',
-          test: /[\\/]node_modules[\\/]/,
-          enforce: true,
+        vendors: {
+          name: 'chunk-vendors',
+          test: /[\\\/]node_modules[\\\/]/,
+          priority: -10,
+          chunks: 'initial'
         },
-      },
+        common: {
+          name: 'chunk-common',
+          minChunks: 2,
+          priority: -20,
+          chunks: 'initial',
+          reuseExistingChunk: true
+        }
+      }
     },
     runtimeChunk: 'single',
     minimizer: [
