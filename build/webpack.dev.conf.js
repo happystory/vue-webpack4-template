@@ -52,7 +52,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       },
     ],
   },
-  devtool: '#source-map',
+  devtool: 'cheap-module-source-map',
   devServer: {
     clientLogLevel: 'warning',
     historyApiFallback: {
